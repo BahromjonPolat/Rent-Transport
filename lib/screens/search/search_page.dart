@@ -7,6 +7,7 @@ class SearchPage extends StatefulWidget {
   String? searchingItem;
 
   SearchPage({Key? key, this.searchingItem}) : super(key: key);
+
   @override
   _SearchPageState createState() => _SearchPageState();
 }
@@ -17,9 +18,17 @@ class _SearchPageState extends State<SearchPage> {
   Size? _size;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    print('_SearchPageState.initState');
+    super.initState();
     _searchingItem = widget.searchingItem.toString();
-    _transportList = _getTransports();
+    _transportList = [];
+    _getTransports(_searchingItem!);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print('_SearchPageState.build');
     _size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -29,8 +38,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  _getBody() =>
-      Container(
+  _getBody() => Container(
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -42,37 +50,32 @@ class _SearchPageState extends State<SearchPage> {
       );
 
   _searchItem() => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-    child: TextFormField(
-      initialValue: _searchingItem.toString(),
-      textInputAction: TextInputAction.search,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.0),
-            borderSide: BorderSide.none),
-        fillColor: Colors.grey[300],
-        filled: true,
-        hintText: "What transport do you need?",
-        prefixIcon:
-        const Icon(CupertinoIcons.search, color: Colors.grey),
-        contentPadding: EdgeInsets.zero,
-      ),
-      onFieldSubmitted: (value) {
-        setState(() {
-          _searchingItem = value;
-          print('_SearchPageState._searchItem $value');
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: TextFormField(
+          initialValue: _searchingItem.toString(),
+          textInputAction: TextInputAction.search,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.0),
+                borderSide: BorderSide.none),
+            fillColor: Colors.grey[300],
+            filled: true,
+            hintText: "What transport do you need?",
+            prefixIcon: const Icon(CupertinoIcons.search, color: Colors.grey),
+            contentPadding: EdgeInsets.zero,
+          ),
+          onFieldSubmitted: (value) {
+            setState(() {
+              _searchingItem = value;
+              _getTransports(value);
             });
-      },
+          },
+        ),
+      );
 
-    ),
-  );
+  _getEmpty() => Container();
 
-  _getEmpty() => Container(
-
-  );
-
-  _getResultList() =>
-      Container(
+  _getResultList() => Container(
         height: _size!.height * 0.8,
         child: ListView.builder(
             itemCount: _transportList!.length,
@@ -83,32 +86,36 @@ class _SearchPageState extends State<SearchPage> {
             }),
       );
 
-  _setTransportInfoLayout(Transport transport) =>
-      Card(
+  /// Transport Layout
+  _setTransportInfoLayout(Transport transport) => Card(
         child: ListTile(
           leading: Container(
             width: 64.0,
             height: 64.0,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.0),
-              image: DecorationImage(fit: BoxFit.cover, image: NetworkImage(transport.imageUrl))
-            ),
-
+                borderRadius: BorderRadius.circular(12.0),
+                image: DecorationImage(
+                    fit: BoxFit.cover,
+                    image: NetworkImage(transport.imageUrl))),
           ),
-          title: Text(transport.name, style: TextStyle(fontWeight: FontWeight.bold),),
+          title: Text(
+            transport.name,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           subtitle: Text("\$${transport.pricePerDay} per day"),
         ),
       );
 
-  List<Transport> _getTransports() {
-    List<Transport> transports = [];
-
+  void _getTransports(String search) {
+    print('_SearchPageState._getTransports $search');
+    _transportList = [];
     for (Transport transport in carList) {
-      if (transport.name.toLowerCase().contains(
-          widget.searchingItem.toString().toLowerCase())) {
-        transports.add(transport);
+      if (transport.name
+          .toLowerCase()
+          .contains(search.toString().toLowerCase())) {
+        _transportList!.add(transport);
+        print('_SearchPageState._getTransports ${transport.name}');
       }
     }
-    return transports;
   }
 }

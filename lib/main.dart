@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rent_car/screens/home/home_page.dart';
+import 'package:rent_car/screens/registeration/registration_page.dart';
 
 main() => runApp(MyApp());
 
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget{
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Rent App",
-      home: HomePage(),
+      home: RegistrationPage(),
     );
   }
 }
